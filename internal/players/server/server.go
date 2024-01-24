@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/erupshis/golang-integration-developer-test/internal/server"
+	"github.com/erupshis/golang-integration-developer-test/internal/common/server"
 	"github.com/go-chi/chi/v5"
 )
 

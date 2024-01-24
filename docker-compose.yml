@@ -1,0 +1,21 @@
+# docker-compose.yml
+version: '3.7'
+
+services:
+  players:
+    image: players:latest
+    container_name: players
+    build:
+      context: .
+      dockerfile: docker/players.DockerFile
+    restart: unless-stopped
+    networks:
+      - net-internal
+    ports:
+      - '18080:8080'
+    environment:
+      HOST: :8080
+
+networks:
+  net-internal:
+    driver: bridge

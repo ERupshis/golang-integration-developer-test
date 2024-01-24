@@ -58,21 +58,21 @@ func main() {
 	router := chi.NewRouter()
 	router.Mount("/api/v1", httpController.Route())
 	router.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("http://%s/swagger/doc.json", cfg.Host)),
+		httpSwagger.URL(fmt.Sprintf("http://localhost%s/swagger/doc.json", cfg.Host)),
 	))
 
-	// server launch.
+	// dataprovider launch.
 	srv := server.NewServer(cfg.Host, router, "http")
 	srv.Host(cfg.Host)
 
 	go func() {
 		listener, err := net.Listen("tcp", cfg.Host)
 		if err != nil {
-			logs.Fatalf("failed to listen for %s server: %v", srv.GetInfo(), err)
+			logs.Fatalf("failed to listen for %s dataprovider: %v", srv.GetInfo(), err)
 		}
 
 		if err = srv.Serve(listener); err != nil {
-			logs.Infof("http://%s server refused to start or stop with error: %v", srv.GetInfo(), err)
+			logs.Infof("http://%s dataprovider refused to start or stop with error: %v", srv.GetInfo(), err)
 			return
 		}
 	}()
@@ -88,7 +88,7 @@ func main() {
 		<-sigCh
 
 		if err = srv.GracefulStop(ctxWithCancel); err != nil {
-			logs.Infof("%s server graceful stop error: %v", srv.GetInfo(), err)
+			logs.Infof("%s dataprovider graceful stop error: %v", srv.GetInfo(), err)
 		}
 
 		cancel()

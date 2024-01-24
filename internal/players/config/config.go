@@ -28,7 +28,7 @@ const (
 
 // checkFlags checks flags of app's launch.
 func checkFlags(config *Config) {
-	flag.StringVar(&config.Host, flagHostAddress, "localhost:8080", "http server host")
+	flag.StringVar(&config.Host, flagHostAddress, "localhost:8080", "http dataprovider host")
 
 	flag.Parse()
 }
