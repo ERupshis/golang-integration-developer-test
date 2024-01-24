@@ -2,6 +2,7 @@ package models
 
 type Games []Game
 
+//go:generate easyjson -all models.go
 type Game struct {
 	ID                   int64  `json:"id"`
 	Title                string `json:"title"`

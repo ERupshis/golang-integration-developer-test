@@ -5,6 +5,11 @@ const (
 )
 
 const (
+	ID     = "id"
+	Amount = "amount"
+)
+
+const (
 	Platform       = "platform"
 	PlatformPC     = "pc"
 	PlatformMobile = "mobile"

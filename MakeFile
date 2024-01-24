@@ -1,0 +1,4 @@
+.PHONY:
+
+swag_players:
+	swag init -g cmd/players/main.go -o cmd/players/docs

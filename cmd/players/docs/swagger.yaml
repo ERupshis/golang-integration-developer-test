@@ -1,0 +1,90 @@
+basePath: /api/v1
+definitions:
+  models.UserData:
+    properties:
+      balance:
+        type: integer
+      id:
+        type: integer
+    type: object
+info:
+  contact:
+    email: e.rupshis@gmail.com
+    name: erupshis
+  description: Swagger API for players storage.
+  termsOfService: http://swagger.io/terms/
+  title: Players service Swagger API
+  version: "1.0"
+paths:
+  /player:
+    get:
+      description: provides player data by playerID
+      operationId: player-select
+      parameters:
+      - description: player search by id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserData'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: select player by ID
+      tags:
+      - player
+  /withdraw:
+    patch:
+      description: withdraw currency from player balance
+      operationId: player-withdraw
+      parameters:
+      - description: player search by id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: currency amount
+        in: query
+        name: amount
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "204":
+          description: user not found
+          schema:
+            type: string
+        "400":
+          description: incorrect query in request
+          schema:
+            type: string
+        "405":
+          description: insufficient funds
+          schema:
+            type: string
+        "500":
+          description: unexpected marshalling error
+          schema:
+            type: string
+      summary: withdraw currency from player account by ID
+      tags:
+      - player
+swagger: "2.0"

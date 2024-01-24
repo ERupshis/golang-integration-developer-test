@@ -3,14 +3,16 @@ package deferutils
 import (
 	"fmt"
 	"testing"
+
+	"github.com/erupshis/golang-integration-developer-test/internal/common/logger"
 )
 
 func TestExecuteWithLogError(t *testing.T) {
-	log := logs.CreateMock()
+	log := logger.CreateMock()
 
 	type args struct {
 		callback func() error
-		log      logs.BaseLogs
+		log      logger.BaseLogger
 	}
 	tests := []struct {
 		name string
