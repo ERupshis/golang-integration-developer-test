@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	"github.com/erupshis/golang-integration-developer-test/internal/models"
+	"github.com/erupshis/golang-integration-developer-test/internal/service/models"
 )
 
 type BaseClient interface {

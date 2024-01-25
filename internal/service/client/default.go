@@ -12,7 +12,7 @@ import (
 	"github.com/erupshis/golang-integration-developer-test/internal/common/consts"
 	"github.com/erupshis/golang-integration-developer-test/internal/common/retrier"
 	"github.com/erupshis/golang-integration-developer-test/internal/common/utils/deferutils"
-	"github.com/erupshis/golang-integration-developer-test/internal/models"
+	"github.com/erupshis/golang-integration-developer-test/internal/service/models"
 )
 
 var repeatableErrors []error

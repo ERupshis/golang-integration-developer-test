@@ -3,6 +3,20 @@ version: '3.7'
 
 services:
   players:
+    image: integration:latest
+    container_name: integration
+    build:
+      context: .
+      dockerfile: docker/integration.DockerFile
+    restart: unless-stopped
+    networks:
+      - net-internal
+    ports:
+      - '18081:8081'
+    environment:
+      HOST: :8081
+
+  integration:
     image: players:latest
     container_name: players
     build:

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package integration.v1;
+option go_package = "github.com/erupshis/golang-integration-developer-test/pb/";
 
 service Service {
   rpc GetBalance(GetBalanceRequest) returns (GetBalanceResponse) {}

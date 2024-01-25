@@ -12,7 +12,7 @@ COPY ../go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /players_exec ./cmd/players/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /intergration_exec ./cmd/integration/main.go
 
 ##
 ## Run the tests in the container
@@ -29,9 +29,9 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
 WORKDIR /
 
-COPY --from=build-stage /players_exec /players_exec
+COPY --from=build-stage /intergration_exec /intergration_exec
 
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["/players_exec"]
+ENTRYPOINT ["/intergration_exec"]
