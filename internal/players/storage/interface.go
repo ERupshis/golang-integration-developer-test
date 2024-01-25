@@ -5,6 +5,6 @@ import (
 )
 
 type BaseUserStorage interface {
-	GetUserByID(id int64) (*models.UserData, error)
-	WithdrawBalance(ID, amount int64) error
+	GetUserByID(id int64) (*models.UserDataP, error)
+	WithdrawBalance(ID, amount int64) (int64, error)
 }

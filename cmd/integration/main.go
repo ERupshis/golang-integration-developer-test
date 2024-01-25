@@ -12,6 +12,7 @@ import (
 	"github.com/erupshis/golang-integration-developer-test/internal/common/utils/deferutils"
 	"github.com/erupshis/golang-integration-developer-test/internal/integration/config"
 	"github.com/erupshis/golang-integration-developer-test/internal/integration/controller"
+	"github.com/erupshis/golang-integration-developer-test/internal/integration/interceptors/logging"
 	"github.com/erupshis/golang-integration-developer-test/internal/integration/server"
 	"github.com/erupshis/golang-integration-developer-test/internal/service/client"
 	"google.golang.org/grpc"
@@ -31,15 +32,15 @@ func main() {
 	}
 
 	// handlers controller.
-	defClient := client.NewDefault("")
+	defClient := client.NewDefault(cfg.PlayersHost)
 	grpcController := controller.NewController(defClient)
 
 	// gRPC server options.
 	var opts []grpc.ServerOption
 	opts = append(opts, grpc.Creds(insecure.NewCredentials()))
-	opts = append(opts, grpc.ChainUnaryInterceptor())
+	opts = append(opts, grpc.ChainUnaryInterceptor(logging.UnaryServer(logs)))
 	// gRPC server
-	srv := server.NewServer(grpcController, "grpc")
+	srv := server.NewServer(grpcController, "grpc", opts...)
 	srv.Host(cfg.Host)
 
 	go func() {

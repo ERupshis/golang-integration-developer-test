@@ -12,15 +12,15 @@ var (
 )
 
 type UserStorage struct {
-	users map[int64]models.UserData
+	users map[int64]models.UserDataP
 	mu    sync.RWMutex
 }
 
-func NewUserStorage(users map[int64]models.UserData) *UserStorage {
+func NewUserStorage(users map[int64]models.UserDataP) *UserStorage {
 	return &UserStorage{users: users}
 }
 
-func (us *UserStorage) GetUserByID(ID int64) (*models.UserData, error) {
+func (us *UserStorage) GetUserByID(ID int64) (*models.UserDataP, error) {
 	us.mu.RLock()
 	defer us.mu.RUnlock()
 
@@ -31,22 +31,19 @@ func (us *UserStorage) GetUserByID(ID int64) (*models.UserData, error) {
 	return &userData, nil
 }
 
-func (us *UserStorage) WithdrawBalance(ID, amount int64) error {
-	us.mu.RLock()
+func (us *UserStorage) WithdrawBalance(ID, amount int64) (int64, error) {
+	us.mu.Lock()
+	defer us.mu.Unlock()
 	userData, ok := us.users[ID]
 	if !ok {
-		return storage.ErrUserNotFound
+		return -1, storage.ErrUserNotFound
 	}
 
 	if userData.Balance < amount {
-		return storage.ErrUserInSufficientFunds
+		return -1, storage.ErrUserInSufficientFunds
 	}
-	us.mu.RUnlock()
-
-	us.mu.Lock()
-	defer us.mu.Unlock()
 
 	userData.Balance -= amount
 	us.users[ID] = userData
-	return nil
+	return userData.Balance, nil
 }

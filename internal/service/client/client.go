@@ -9,4 +9,5 @@ import (
 type BaseClient interface {
 	GetGames(ctx context.Context, platform string) (models.Games, error)
 	GetBalance(ctx context.Context, playerID string) (int64, error)
+	WithdrawBalance(ctx context.Context, playerID string, amount int64) (int64, error)
 }

@@ -7,12 +7,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
+	"strconv"
 
 	"github.com/erupshis/golang-integration-developer-test/internal/common/consts"
 	"github.com/erupshis/golang-integration-developer-test/internal/common/retrier"
 	"github.com/erupshis/golang-integration-developer-test/internal/common/utils/deferutils"
 	"github.com/erupshis/golang-integration-developer-test/internal/service/models"
+)
+
+const (
+	getBalanceURI      = "http://%s/api/v1/player"
+	withdrawBalanceURI = "http://%s/api/v1/withdraw"
 )
 
 var repeatableErrors []error
@@ -36,17 +41,16 @@ func NewDefault(host string) BaseClient {
 func (d *Default) GetGames(ctx context.Context, platform string) (models.Games, error) {
 	errMsg := "get games list: %w"
 
-	if !consts.IsPlatformValid(platform) {
-		return nil, fmt.Errorf(errMsg, ErrInvalidPlatform)
-	}
-
-	fullURI, err := enrichURIWithPlatform(consts.GamesHost, platform)
+	fullURI, err := enrichURI(
+		consts.GamesHost,
+		[]URIParam{{consts.Platform, platform}},
+	)
 	if err != nil {
 		return nil, fmt.Errorf(errMsg, err)
 	}
 
 	request := func(context context.Context) ([]byte, error) {
-		return d.makeRequest(context, http.MethodPost, fullURI, nil)
+		return d.makeRequest(context, http.MethodGet, fullURI, nil)
 	}
 
 	rawGames, err := retrier.RetryCallWithTimeout[[]byte](ctx, nil, repeatableErrors, request)
@@ -60,6 +64,81 @@ func (d *Default) GetGames(ctx context.Context, platform string) (models.Games, 
 	}
 
 	return games, nil
+}
+
+func (d *Default) GetBalance(ctx context.Context, playerID string) (int64, error) {
+	errMsg := "get player balance: %w"
+
+	fullURI, err := enrichURI(
+		fmt.Sprintf(getBalanceURI, d.host),
+		[]URIParam{{consts.ID, playerID}},
+	)
+	if err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	request := func(context context.Context) ([]byte, error) {
+		return d.makeRequest(context, http.MethodGet, fullURI, nil)
+	}
+
+	rawPlayerData, err := retrier.RetryCallWithTimeout[[]byte](ctx, nil, repeatableErrors, request)
+	if err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	playerData := models.UserData{}
+	if err = json.Unmarshal(rawPlayerData, &playerData); err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	return playerData.Balance, nil
+}
+
+func (d *Default) WithdrawBalance(ctx context.Context, playerID string, amount int64) (int64, error) {
+	errMsg := "withdraw player balance: %w"
+
+	ID, err := strconv.ParseInt(playerID, 10, 64)
+	if err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	requestPlayerData := models.UserWithdraw{
+		ID:     ID,
+		Amount: amount,
+	}
+
+	reqBody, err := json.Marshal(requestPlayerData)
+	if err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	request := func(context context.Context) ([]byte, error) {
+		return d.makeRequest(context, http.MethodPatch, fmt.Sprintf(withdrawBalanceURI, d.host), reqBody)
+	}
+
+	rawPlayerData, err := retrier.RetryCallWithTimeout[[]byte](ctx, nil, repeatableErrors, request)
+	if err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	if rawPlayerData != nil && rawPlayerData[0] != '{' {
+		switch string(rawPlayerData) {
+		case ErrUserNotFound.Error():
+			return -1, ErrUserNotFound
+		case ErrInsufficientFunds.Error():
+			return -1, ErrInsufficientFunds
+		default:
+			return -1, fmt.Errorf(string(rawPlayerData))
+		}
+	}
+
+	fmt.Println(string(rawPlayerData))
+	playerData := models.UserData{}
+	if err = json.Unmarshal(rawPlayerData, &playerData); err != nil {
+		return -1, fmt.Errorf(errMsg, err)
+	}
+
+	return playerData.Balance, nil
 }
 
 func (d *Default) makeRequest(ctx context.Context, method string, URI string, body []byte) ([]byte, error) {
@@ -81,21 +160,4 @@ func (d *Default) makeRequest(ctx context.Context, method string, URI string, bo
 	}
 
 	return respBody, nil
-}
-
-func (d *Default) GetBalance(ctx context.Context, playerID string) (int64, error) {
-	return 0, nil
-}
-
-func enrichURIWithPlatform(URI, platform string) (string, error) {
-	u, err := url.Parse(URI)
-	if err != nil {
-		return "", fmt.Errorf("enrich URI with game platform: %w", err)
-	}
-
-	params := url.Values{}
-	params.Add(consts.Platform, platform)
-
-	u.RawQuery = params.Encode()
-	return u.String(), nil
 }

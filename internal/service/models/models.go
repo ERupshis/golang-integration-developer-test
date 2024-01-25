@@ -16,3 +16,23 @@ type Game struct {
 	ReleaseDate          string `json:"release_date"`
 	FreeToGameProfileURL string `json:"freetogame_profile_url"`
 }
+
+func (g *Games) FindGameByID(ID int64) *Game {
+	for _, game := range *g {
+		if game.ID == ID {
+			return &game
+		}
+	}
+
+	return nil
+}
+
+type UserData struct {
+	ID      int64 `json:"id"`
+	Balance int64 `json:"balance"`
+}
+
+type UserWithdraw struct {
+	ID     int64 `json:"id"`
+	Amount int64 `json:"amount"`
+}

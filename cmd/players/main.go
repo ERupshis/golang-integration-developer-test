@@ -21,7 +21,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-var users = map[int64]models.UserData{
+var users = map[int64]models.UserDataP{
 	1: {1, 1000},
 	2: {2, 100},
 	3: {3, 0},

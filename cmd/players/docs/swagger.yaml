@@ -1,8 +1,15 @@
 basePath: /api/v1
 definitions:
-  models.UserData:
+  models.UserDataP:
     properties:
       balance:
+        type: integer
+      id:
+        type: integer
+    type: object
+  models.UserWithdrawP:
+    properties:
+      amount:
         type: integer
       id:
         type: integer
@@ -32,15 +39,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserData'
-        "204":
-          description: No Content
+            $ref: '#/definitions/models.UserDataP'
         "400":
-          description: Bad Request
+          description: incorrect query in request
+          schema:
+            type: string
+        "404":
+          description: user not found
           schema:
             type: string
         "500":
-          description: Internal Server Error
+          description: something wrong with storage
           schema:
             type: string
       summary: select player by ID
@@ -48,32 +57,30 @@ paths:
       - player
   /withdraw:
     patch:
+      consumes:
+      - application/json
       description: withdraw currency from player balance
       operationId: player-withdraw
       parameters:
-      - description: player search by id
-        in: query
-        name: id
+      - description: user withdraw amount
+        in: body
+        name: input
         required: true
-        type: string
-      - description: currency amount
-        in: query
-        name: amount
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.UserWithdrawP'
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             type: string
-        "204":
-          description: user not found
+        "400":
+          description: incorrect request
           schema:
             type: string
-        "400":
-          description: incorrect query in request
+        "404":
+          description: user not found
           schema:
             type: string
         "405":

@@ -43,20 +43,23 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserData"
+                            "$ref": "#/definitions/models.UserDataP"
                         }
                     },
-                    "204": {
-                        "description": "No Content"
-                    },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "incorrect query in request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "user not found",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "something wrong with storage",
                         "schema": {
                             "type": "string"
                         }
@@ -67,8 +70,11 @@ const docTemplate = `{
         "/withdraw": {
             "patch": {
                 "description": "withdraw currency from player balance",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "player"
@@ -77,18 +83,13 @@ const docTemplate = `{
                 "operationId": "player-withdraw",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "player search by id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "currency amount",
-                        "name": "amount",
-                        "in": "query",
-                        "required": true
+                        "description": "user withdraw amount",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserWithdrawP"
+                        }
                     }
                 ],
                 "responses": {
@@ -98,14 +99,14 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "204": {
-                        "description": "user not found",
+                    "400": {
+                        "description": "incorrect request",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "incorrect query in request",
+                    "404": {
+                        "description": "user not found",
                         "schema": {
                             "type": "string"
                         }
@@ -127,10 +128,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.UserData": {
+        "models.UserDataP": {
             "type": "object",
             "properties": {
                 "balance": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.UserWithdrawP": {
+            "type": "object",
+            "properties": {
+                "amount": {
                     "type": "integer"
                 },
                 "id": {

@@ -10,18 +10,11 @@ const (
 )
 
 const (
-	Platform       = "platform"
-	PlatformPC     = "pc"
-	PlatformMobile = "mobile"
+	Platform        = "platform"
+	PlatformPC      = "pc"
+	PlatformBrowser = "browser"
 )
 
-func IsPlatformValid(platform string) bool {
-	switch platform {
-	case PlatformPC:
-		fallthrough
-	case PlatformMobile:
-		return true
-	default:
-		return false
-	}
-}
+const (
+	CurrencyUSD = "USD"
+)

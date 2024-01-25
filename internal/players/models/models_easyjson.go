@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonD2b7633eDecodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(in *jlexer.Lexer, out *UserData) {
+func easyjsonD2b7633eDecodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(in *jlexer.Lexer, out *UserDataP) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -50,7 +50,7 @@ func easyjsonD2b7633eDecodeGithubComErupshisGolangIntegrationDeveloperTestIntern
 		in.Consumed()
 	}
 }
-func easyjsonD2b7633eEncodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(out *jwriter.Writer, in UserData) {
+func easyjsonD2b7633eEncodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(out *jwriter.Writer, in UserDataP) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -68,25 +68,25 @@ func easyjsonD2b7633eEncodeGithubComErupshisGolangIntegrationDeveloperTestIntern
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v UserData) MarshalJSON() ([]byte, error) {
+func (v UserDataP) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjsonD2b7633eEncodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v UserData) MarshalEasyJSON(w *jwriter.Writer) {
+func (v UserDataP) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjsonD2b7633eEncodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *UserData) UnmarshalJSON(data []byte) error {
+func (v *UserDataP) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjsonD2b7633eDecodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *UserData) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *UserDataP) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonD2b7633eDecodeGithubComErupshisGolangIntegrationDeveloperTestInternalPlayersModels(l, v)
 }

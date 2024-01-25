@@ -10,7 +10,8 @@ import (
 
 // Config player's storage service.
 type Config struct {
-	Host string `json:"address"`
+	Host        string `json:"address"`
+	PlayersHost string `json:"players_host"`
 }
 
 // Parse main func to parse variables.
@@ -23,12 +24,14 @@ func Parse() (Config, error) {
 
 // FLAGS PARSING.
 const (
-	flagHostAddress = "addr"
+	flagHostAddress        = "addr"
+	flagPlayersHostAddress = "p_addr"
 )
 
 // checkFlags checks flags of app's launch.
 func checkFlags(config *Config) {
-	flag.StringVar(&config.Host, flagHostAddress, ":8081", "grpc server host")
+	flag.StringVar(&config.Host, flagHostAddress, "localhost:18081", "grpc server host")
+	flag.StringVar(&config.Host, flagPlayersHostAddress, "localhost:8080", "players storage host")
 
 	flag.Parse()
 }
@@ -36,7 +39,8 @@ func checkFlags(config *Config) {
 // ENVIRONMENTS PARSING.
 // envConfig struct of environments suitable for agent.
 type envConfig struct {
-	Host string `env:"HOST"`
+	Host        string `env:"HOST"`
+	PlayersHost string `env:"PLAYERS_HOST"`
 }
 
 // checkEnvironments checks environments suitable for agent.
@@ -49,6 +53,7 @@ func checkEnvironments(config *Config) error {
 
 	var errs []error
 	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.Host, envs.Host))
+	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.PlayersHost, envs.PlayersHost))
 
 	resErr := errors.Join(errs...)
 	if resErr != nil {

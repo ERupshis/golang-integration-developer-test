@@ -1,22 +1,7 @@
-# docker-compose.yml
 version: '3.7'
 
 services:
   players:
-    image: integration:latest
-    container_name: integration
-    build:
-      context: .
-      dockerfile: docker/integration.DockerFile
-    restart: unless-stopped
-    networks:
-      - net-internal
-    ports:
-      - '18081:8081'
-    environment:
-      HOST: :8081
-
-  integration:
     image: players:latest
     container_name: players
     build:
@@ -29,6 +14,23 @@ services:
       - '18080:8080'
     environment:
       HOST: :8080
+
+  integration:
+    image: integration:latest
+    container_name: integration
+    build:
+      context: .
+      dockerfile: docker/integration.DockerFile
+    restart: unless-stopped
+    networks:
+      - net-internal
+    ports:
+      - '18081:8081'
+    environment:
+      HOST: :8081
+      PLAYERS_HOST: players:8080
+    depends_on:
+      - players
 
 networks:
   net-internal:
