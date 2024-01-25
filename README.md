@@ -29,3 +29,6 @@ this project.
 ## Credits
 Thank you for [FreeToGame.com](https://www.freetogame.com) portal for providing free API.
 
+## How to start:
+- make docker_up - to run containers.
+- grpc server will be available on :18081 port.
