@@ -1,0 +1,23 @@
+.PHONY:
+
+swag_players:
+	swag init -g cmd/players/main.go -o cmd/players/docs
+
+docker_down:
+	docker-compose stop
+	docker-compose down
+	docker rmi players integration
+
+docker_up:
+	docker-compose up
+
+containers:
+	docker ps -a
+
+proto:
+	protoc --proto_path=./pb/ \
+		--go_out=./pb \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=./pb \
+		--go-grpc_opt=paths=source_relative \
+		./pb/integration.proto
