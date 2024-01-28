@@ -19,11 +19,9 @@ services:
     image: postgres:14.1-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=auth_db
-      - JWT_KEY=NJFKDNB34njk3hrjk
-      - HASH_KEY=hdsjhgfjkHJJKHBKEdshd%^&%322
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
     ports:
       - '5433:5432'
     networks:
@@ -46,6 +44,8 @@ services:
       HOST: :8081
       PLAYERS_HOST: players:8080
       DATABASE_DSN: postgres://postgres:postgres@auth_db:5432/auth_db?sslmode=disable
+      JWT_KEY: NJFKDNB34njk3hrjk
+      HASH_KEY: hdsjhgfjkHJJKHBKEdshd%^&%322
 
     depends_on:
       - players
