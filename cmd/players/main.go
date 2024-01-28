@@ -51,7 +51,7 @@ func main() {
 	// in-memory users storage.
 	userStorage := inmem.NewUserStorage(users)
 
-	// handlers controller.
+	// handlers integr.
 	httpController := controller.NewController(userStorage, logs)
 
 	// attaching handlers.

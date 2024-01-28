@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/erupshis/golang-integration-developer-test/pb"
+	pb_integr "github.com/erupshis/golang-integration-developer-test/pb/integration"
 )
 
 //go:generate easyjson -all models.go
@@ -10,7 +10,7 @@ type Currency struct {
 	Name string `json:"name"`
 }
 
-func ConvertCurrencyFromGRPC(currency *pb.Currency) *Currency {
+func ConvertCurrencyFromGRPC(currency *pb_integr.Currency) *Currency {
 	return &Currency{
 		Code: currency.GetCode(),
 		Name: currency.GetName(),
@@ -24,8 +24,8 @@ type Game struct {
 	GameURL          string
 }
 
-func ConvertGameToGRPC(game *Game) *pb.Game {
-	return &pb.Game{
+func ConvertGameToGRPC(game *Game) *pb_integr.Game {
+	return &pb_integr.Game{
 		Id:               game.ID,
 		Title:            game.Title,
 		ShortDescription: game.ShortDescription,

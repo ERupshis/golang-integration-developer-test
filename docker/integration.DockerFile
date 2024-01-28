@@ -30,6 +30,7 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 WORKDIR /
 
 COPY --from=build-stage /intergration_exec /intergration_exec
+COPY --from=build-stage /app/db/migrations db/migrations
 
 
 USER nonroot:nonroot

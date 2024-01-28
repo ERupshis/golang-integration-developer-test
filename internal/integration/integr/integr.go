@@ -1,4 +1,4 @@
-package controller
+package integr
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 	"github.com/erupshis/golang-integration-developer-test/internal/integration/validator"
 	"github.com/erupshis/golang-integration-developer-test/internal/service/client"
 	serviceModels "github.com/erupshis/golang-integration-developer-test/internal/service/models"
-	"github.com/erupshis/golang-integration-developer-test/pb"
+	pb_integr "github.com/erupshis/golang-integration-developer-test/pb/integration"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type Controller struct {
-	pb.UnimplementedServiceServer
+	pb_integr.UnimplementedServiceServer
 
 	client client.BaseClient
 }
@@ -26,7 +26,7 @@ func NewController(client client.BaseClient) *Controller {
 	}
 }
 
-func (c *Controller) GetBalance(ctx context.Context, in *pb.GetBalanceRequest) (*pb.GetBalanceResponse, error) {
+func (c *Controller) GetBalance(ctx context.Context, in *pb_integr.GetBalanceRequest) (*pb_integr.GetBalanceResponse, error) {
 	errs := validateGeneral(in.GetGeneral())
 	if len(errs) != 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "%v", errors.Join(errs...))
@@ -47,13 +47,13 @@ func (c *Controller) GetBalance(ctx context.Context, in *pb.GetBalanceRequest) (
 		return nil, status.Errorf(codes.NotFound, "game not found by id")
 	}
 
-	return &pb.GetBalanceResponse{
+	return &pb_integr.GetBalanceResponse{
 		Balance: int32(balance),
 		Game:    models.ConvertGameToGRPC(game),
 	}, nil
 }
 
-func (c *Controller) SendBet(ctx context.Context, in *pb.SendBetRequest) (*pb.SendBetResponse, error) {
+func (c *Controller) SendBet(ctx context.Context, in *pb_integr.SendBetRequest) (*pb_integr.SendBetResponse, error) {
 	errs := validateGeneral(in.GetGeneral())
 	if len(errs) != 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "%v", errors.Join(errs...))
@@ -68,10 +68,10 @@ func (c *Controller) SendBet(ctx context.Context, in *pb.SendBetRequest) (*pb.Se
 		return nil, status.Errorf(codes.Unavailable, "%v", err)
 	}
 
-	return &pb.SendBetResponse{Balance: int32(balance)}, nil
+	return &pb_integr.SendBetResponse{Balance: int32(balance)}, nil
 }
 
-func validateGeneral(in *pb.General) []error {
+func validateGeneral(in *pb_integr.General) []error {
 	var errs []error
 	_, IDErrs := validator.CheckID(in.GetGameId())
 	errs = append(errs, IDErrs...)

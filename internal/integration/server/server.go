@@ -5,8 +5,10 @@ import (
 	"net"
 
 	"github.com/erupshis/golang-integration-developer-test/internal/common/server"
-	"github.com/erupshis/golang-integration-developer-test/internal/integration/controller"
-	"github.com/erupshis/golang-integration-developer-test/pb"
+	"github.com/erupshis/golang-integration-developer-test/internal/integration/auth"
+	"github.com/erupshis/golang-integration-developer-test/internal/integration/integr"
+	pb_auth "github.com/erupshis/golang-integration-developer-test/pb/auth"
+	pb_integr "github.com/erupshis/golang-integration-developer-test/pb/integration"
 	"google.golang.org/grpc"
 )
 
@@ -20,9 +22,10 @@ type Server struct {
 	port string
 }
 
-func NewServer(controller *controller.Controller, info string, options ...grpc.ServerOption) *Server {
+func NewServer(integr *integr.Controller, auth *auth.Controller, info string, options ...grpc.ServerOption) *Server {
 	s := grpc.NewServer(options...)
-	pb.RegisterServiceServer(s, controller)
+	pb_integr.RegisterServiceServer(s, integr)
+	pb_auth.RegisterAuthServer(s, auth)
 
 	srv := &Server{
 		Server: s,

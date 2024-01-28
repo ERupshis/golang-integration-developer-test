@@ -15,6 +15,22 @@ services:
     environment:
       HOST: :8080
 
+  auth_db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth_db
+      - JWT_KEY=NJFKDNB34njk3hrjk
+      - HASH_KEY=hdsjhgfjkHJJKHBKEdshd%^&%322
+    ports:
+      - '5433:5432'
+    networks:
+      - net-internal
+    volumes:
+      - auth_db:/var/lib/postgresql/data
+
   integration:
     image: integration:latest
     container_name: integration
@@ -29,9 +45,15 @@ services:
     environment:
       HOST: :8081
       PLAYERS_HOST: players:8080
+      DATABASE_DSN: postgres://postgres:postgres@auth_db:5432/auth_db?sslmode=disable
+
     depends_on:
       - players
+      - auth_db
 
 networks:
   net-internal:
     driver: bridge
+
+volumes:
+  auth_db:

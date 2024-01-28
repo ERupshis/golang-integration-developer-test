@@ -15,9 +15,16 @@ containers:
 	docker ps -a
 
 proto:
-	protoc --proto_path=./pb/ \
-		--go_out=./pb \
+	protoc --proto_path=./pb/integration/ \
+		--go_out=./pb/integration \
 		--go_opt=paths=source_relative \
-		--go-grpc_out=./pb \
+		--go-grpc_out=./pb/integration \
 		--go-grpc_opt=paths=source_relative \
-		./pb/integration.proto
+		./pb/integration/integration.proto
+
+	protoc --proto_path=./pb/auth/ \
+    		--go_out=./pb/auth \
+    		--go_opt=paths=source_relative \
+    		--go-grpc_out=./pb/auth \
+    		--go-grpc_opt=paths=source_relative \
+    		./pb/auth/auth.proto
