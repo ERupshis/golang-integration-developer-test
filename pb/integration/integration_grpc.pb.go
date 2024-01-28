@@ -4,7 +4,7 @@
 // - protoc             v4.25.1
 // source: integration.proto
 
-package pb
+package pb_integr
 
 import (
 	context "context"
@@ -52,7 +52,7 @@ func (c *serviceClient) SendBet(ctx context.Context, in *SendBetRequest, opts ..
 	return out, nil
 }
 
-// ServiceServer is the integration API for Service service.
+// ServiceServer is the server API for Service service.
 // All implementations must embed UnimplementedServiceServer
 // for forward compatibility
 type ServiceServer interface {

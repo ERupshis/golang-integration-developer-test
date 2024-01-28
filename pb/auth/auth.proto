@@ -1,0 +1,24 @@
+syntax = "proto3";
+package auth.v1;
+
+option go_package = "github.com/erupshis/golang-integration-developer-test/pb/pb-auth";
+
+import "google/protobuf/empty.proto";
+
+service Auth {
+  rpc Login(LoginRequest) returns (google.protobuf.Empty);
+  rpc Register(RegisterRequest) returns (google.protobuf.Empty);
+}
+
+message Creds {
+  string login = 1;
+  string password = 2;
+}
+
+message LoginRequest {
+  Creds creds = 1;
+}
+
+message RegisterRequest {
+  Creds creds = 1;
+}

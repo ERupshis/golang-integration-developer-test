@@ -12,6 +12,9 @@ import (
 type Config struct {
 	Host        string `json:"address"`
 	PlayersHost string `json:"players_host"`
+	DatabaseDSN string `json:"database_dsn"`
+	JWT         string `json:"jwt"`
+	HashKey     string `json:"hash_key"`
 }
 
 // Parse main func to parse variables.
@@ -26,12 +29,18 @@ func Parse() (Config, error) {
 const (
 	flagHostAddress        = "addr"
 	flagPlayersHostAddress = "p_addr"
+	flagDatabaseDSN        = "rdsn"
+	flagJWT                = "jwt"
+	flagHashKey            = "hk"
 )
 
 // checkFlags checks flags of app's launch.
 func checkFlags(config *Config) {
-	flag.StringVar(&config.Host, flagHostAddress, "localhost:18081", "grpc server host")
-	flag.StringVar(&config.Host, flagPlayersHostAddress, "localhost:8080", "players storage host")
+	flag.StringVar(&config.Host, flagHostAddress, ":18081", "grpc server host")
+	flag.StringVar(&config.PlayersHost, flagPlayersHostAddress, "localhost:8080", "players storage host")
+	flag.StringVar(&config.DatabaseDSN, flagDatabaseDSN, "postgres://postgres:postgres@localhost:5432/auth_db?sslmode=disable", "records database DSN")
+	flag.StringVar(&config.JWT, flagJWT, "SECRET_KEY", "jwt token generation key")
+	flag.StringVar(&config.HashKey, flagHashKey, "SECRET_KEY", "user passwords hasher key")
 
 	flag.Parse()
 }
@@ -41,6 +50,9 @@ func checkFlags(config *Config) {
 type envConfig struct {
 	Host        string `env:"HOST"`
 	PlayersHost string `env:"PLAYERS_HOST"`
+	DatabaseDSN string `env:"DATABASE_DSN"`
+	JWT         string `env:"JWT_KEY"`
+	HashKey     string `env:"HASH_KEY"`
 }
 
 // checkEnvironments checks environments suitable for agent.
@@ -54,6 +66,9 @@ func checkEnvironments(config *Config) error {
 	var errs []error
 	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.Host, envs.Host))
 	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.PlayersHost, envs.PlayersHost))
+	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.DatabaseDSN, envs.DatabaseDSN))
+	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.JWT, envs.JWT))
+	errs = append(errs, configutils.SetEnvToParamIfNeed(&config.HashKey, envs.HashKey))
 
 	resErr := errors.Join(errs...)
 	if resErr != nil {
