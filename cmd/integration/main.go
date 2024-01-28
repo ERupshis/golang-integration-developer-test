@@ -74,7 +74,7 @@ func main() {
 	opts = append(opts, grpc.Creds(insecure.NewCredentials()))
 	opts = append(opts, grpc.ChainUnaryInterceptor(
 		logger.UnaryServer(logs),
-		authgrpc.UnaryServer(jwtGenerator, logs),
+		authgrpc.UnaryServer(jwtGenerator),
 	))
 	// gRPC server
 	srv := server.NewServer(integrationController, authController, "grpc", opts...)

@@ -7,7 +7,6 @@ import (
 
 	"github.com/erupshis/golang-integration-developer-test/internal/common/auth"
 	"github.com/erupshis/golang-integration-developer-test/internal/common/jwtgenerator"
-	"github.com/erupshis/golang-integration-developer-test/internal/common/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -21,55 +20,78 @@ var (
 	}
 )
 
-func Authorize(ctx context.Context, jwt *jwtgenerator.JwtGenerator) error {
+type wrappedStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (s *wrappedStream) Context() context.Context {
+	return s.ctx
+}
+
+func Authorize(ctx context.Context, jwt *jwtgenerator.JwtGenerator) (int64, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return status.Error(codes.Unauthenticated, "missing metadata")
+		return -1, status.Error(codes.Unauthenticated, "missing metadata")
 	}
 
 	authHeader, ok := md[auth.TokenHeader]
 	if !ok || len(authHeader) == 0 {
-		return status.Error(codes.Unauthenticated, "missing token in metadata")
+		return -1, status.Error(codes.Unauthenticated, "missing token in metadata")
 	}
 
 	token := strings.Split(authHeader[0], " ")
 	if len(token) != 2 || token[0] != auth.TokenType {
-		return status.Error(codes.InvalidArgument, "incorrect authorization data")
+		return -1, status.Error(codes.InvalidArgument, "incorrect authorization data")
 	}
 
 	userID, err := jwt.GetUserID(token[1])
 	if err != nil {
-		return status.Errorf(codes.Unauthenticated, "jwt validation: %v", err)
+		return -1, status.Errorf(codes.Unauthenticated, "jwt validation: %v", err)
 	}
 
-	mdPairs := metadata.Pairs(
-		auth.UserID, strconv.FormatInt(userID, 10),
-	)
-
-	ctx = metadata.NewIncomingContext(ctx, mdPairs)
-	return nil
+	return userID, nil
 }
 
-func StreamServer(jwt *jwtgenerator.JwtGenerator, logger logger.BaseLogger) grpc.StreamServerInterceptor {
+func StreamServer(jwt *jwtgenerator.JwtGenerator) grpc.StreamServerInterceptor {
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		ctx := ss.Context()
 		procName := info.FullMethod[strings.LastIndex(info.FullMethod, ".")+1:]
 		if _, ok := procExclusions[procName]; !ok {
-			if err := Authorize(ss.Context(), jwt); err != nil {
+			userID, err := Authorize(ss.Context(), jwt)
+			if err != nil {
 				return err
 			}
+
+			md, okMD := metadata.FromIncomingContext(ctx)
+			if !okMD {
+				return auth.ErrReadHeaders
+			}
+
+			md.Append(auth.UserID, strconv.FormatInt(userID, 10))
+			ctx = metadata.NewIncomingContext(ctx, md)
 		}
 
-		return handler(srv, ss)
+		return handler(srv, &wrappedStream{ss, ctx})
 	}
 }
 
-func UnaryServer(jwt *jwtgenerator.JwtGenerator, logger logger.BaseLogger) grpc.UnaryServerInterceptor {
+func UnaryServer(jwt *jwtgenerator.JwtGenerator) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		procName := info.FullMethod[strings.LastIndex(info.FullMethod, ".")+1:]
 		if _, ok := procExclusions[procName]; !ok {
-			if err := Authorize(ctx, jwt); err != nil {
+			userID, err := Authorize(ctx, jwt)
+			if err != nil {
 				return nil, err
 			}
+
+			md, okMD := metadata.FromIncomingContext(ctx)
+			if !okMD {
+				return nil, auth.ErrReadHeaders
+			}
+
+			md.Append(auth.UserID, strconv.FormatInt(userID, 10))
+			ctx = metadata.NewIncomingContext(ctx, md)
 		}
 
 		return handler(ctx, req)
